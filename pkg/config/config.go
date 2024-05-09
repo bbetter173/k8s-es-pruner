@@ -16,6 +16,7 @@ type Config struct {
 		Username   string `yaml:"username"`
 		Password   string `yaml:"password"`
 		CACertPath string `yaml:"ca_cert_path"`
+		SkipVerify bool   `yaml:"skip_tls_verify"`
 	} `yaml:"cluster"`
 	Aliases []Alias `yaml:"aliases"`
 }
@@ -56,6 +57,9 @@ func overrideWithEnvVars(cfg *Config) {
 	}
 	if caCertPath := os.Getenv("ES_CA_CERT_PATH"); caCertPath != "" {
 		cfg.Cluster.CACertPath = caCertPath
+	}
+	if skipVerify := os.Getenv("ES_SKIP_TLS_VERIFY"); skipVerify != "" {
+		cfg.Cluster.SkipVerify = skipVerify == "true"
 	}
 }
 

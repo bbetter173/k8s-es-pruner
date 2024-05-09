@@ -3,6 +3,7 @@ cluster:
   username: "elastic"
   password: "9Fj1dUB9r9k5Fqj76yF1Co48"
   ca_cert_path: ""
+  skip_tls_verify: true
 
 aliases:
   - name: "cluster-logs"

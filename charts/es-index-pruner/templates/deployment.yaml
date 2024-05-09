@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "es-index-pruner.fullname" . }}
+  labels:
+    {{- include "es-index-pruner.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "es-index-pruner.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "es-index-pruner.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "es-index-pruner.fullname" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /root/es-index-pruner
+            - --lease-lock-namespace
+            - {{ .Release.Namespace }}
+            - --lease-lock-name
+            - {{ .Values.leaderElectionId }}
+          env:
+            {{- range $key, $value := .Values.envFromSecrets }}
+            - name: {{ $key }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key }}
+            {{- end }}
+            {{- range .Values.env }}
+            - name: {{ .name }}
+              value: {{ .value }}
+            {{- end }}
+          volumeMounts:
+            - name: espruner-config
+              mountPath: /root/config.yaml
+              subPath: config.yaml
+          {{- range .Values.extraVolumeMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              {{- if .subPath }}
+              subPath: {{ .subPath }}
+              {{- end }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: espruner-config
+          configMap:
+            name: {{ include "es-index-pruner.fullname" . }}
+      {{- range .Values.secretVolumes }}
+        - name: {{ .name }}
+          secret:
+            secretName: {{ .secretName }}
+      {{- end }}
+      {{- range .Values.configMapVolumes }}
+        - name: {{ .name }}
+          configMap:
+            name: {{ .configMapName }}
+      {{- end }}

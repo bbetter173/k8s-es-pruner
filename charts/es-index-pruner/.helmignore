@@ -1,0 +1,7 @@
+# Patterns to ignore when building packages.
+*.DS_Store
+# Ignore all text files.
+*.txt
+# Ignore Git related files
+.git
+.gitignore

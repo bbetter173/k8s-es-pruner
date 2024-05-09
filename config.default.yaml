@@ -1,0 +1,10 @@
+cluster:
+  url: "http://localhost:9200"
+  username: ""
+  password: ""
+  ca_cert_path: ""
+  skip_tls_verify: true
+
+aliases:
+  - name: "logs"
+    max_size: "20GiB"

@@ -1,0 +1,57 @@
+replicaCount: 2
+
+leaderElectionNamespace: cattle-monitoring-system
+leaderElectionId: es-index-pruner
+
+image:
+  repository: hewhowas/es-index-pruner
+  pullPolicy: Always
+  tag: "latest"
+
+config:
+  aliases:
+    - name: "cluster-logs"
+      max_size: "20GiB"
+
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+#   memory: 128Mi
+
+envFromSecrets:
+  ES_PASSWORD:
+    name: rancher-logging-es-elastic-user
+    key: elastic
+
+env:
+  - name: ES_USERNAME
+    value: elastic
+  - name: ES_CLUSTER_URL
+    value: "https://rancher-logging-es-http:9200"
+  - name: ES_CA_CERT_PATH
+    value: /etc/app-ca-bundle.crt
+
+extraVolumeMounts:
+  - name: config-volume
+    mountPath: /etc/app-ca-bundle.crt
+    subPath: ca.crt
+
+secretVolumes:
+  - name: config-volume
+    secretName: rancher-logging-es-http-certs-public
+
+configMapVolumes: []
+  #- name: config-volume
+  #  configMapName: es-index-pruner-config
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+serviceAccount:
+  enabled: true
