@@ -71,6 +71,8 @@ func main() {
 		logger.Panicf("error validating configuration: %v", err)
 	}
 
+	logger.Infof("Configuration: %+v", cfg)
+	
 	// Create a new Elasticsearch client
 	esClient, err := elasticsearch.NewClient(cfg, logger)
 	if err != nil {
