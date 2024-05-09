@@ -3,6 +3,15 @@ entries:
   es-index-pruner:
   - apiVersion: v2
     appVersion: "1.0"
+    created: "2024-05-09T15:10:51.556334444Z"
+    description: A Helm chart for Kubernetes to deploy ES Index Pruner
+    digest: 4f3f3ee5e767c85af5551fc963794675c7ef569a6e60fc5aa15b5fd94787f025
+    name: es-index-pruner
+    urls:
+    - https://github.com/bbetter173/k8s-es-pruner/releases/download/es-index-pruner-0.1.2/es-index-pruner-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
+    appVersion: "1.0"
     created: "2024-05-09T12:11:39.217880285Z"
     description: A Helm chart for Kubernetes to deploy ES Index Pruner
     digest: e8b9e6462d3eedc01ef1bc19e92d047ac087db8fb65d42400e2d64ee36b2e94d
@@ -10,4 +19,4 @@ entries:
     urls:
     - https://github.com/bbetter173/k8s-es-pruner/releases/download/es-index-pruner-0.1.1/es-index-pruner-0.1.1.tgz
     version: 0.1.1
-generated: "2024-05-09T12:11:39.217996492Z"
+generated: "2024-05-09T15:10:51.55634326Z"
