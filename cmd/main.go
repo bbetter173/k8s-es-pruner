@@ -53,12 +53,12 @@ func main() {
 	flag.StringVar(&leaseLockNamespace, "lease-lock-namespace", "", "the lease lock resource namespace")
 	flag.Parse()
 
-	if leaseLockName == "" {
+	/*if leaseLockName == "" {
 		klog.Fatal("unable to get lease lock resource name (missing lease-lock-name flag).")
 	}
 	if leaseLockNamespace == "" {
 		klog.Fatal("unable to get lease lock resource namespace (missing lease-lock-namespace flag).")
-	}
+	}*/
 
 	// Load configuration
 	cfg, err := config.LoadConfig("./config.yaml")
@@ -79,6 +79,10 @@ func main() {
 		logger.Panicf("error creating ES client: %v", err)
 	}
 	esClient.DryRun = *dryRun
+
+	esClient.StartMonitoring(context.Background(), time.Duration(cfg.PollInterval)*time.Second)
+
+	return
 
 	config, err := buildConfig(kubeconfig)
 	if err != nil {
@@ -132,9 +136,9 @@ func main() {
 		// get elected before your background loop finished, violating
 		// the stated goal of the lease.
 		ReleaseOnCancel: true,
-		LeaseDuration:   60 * time.Second,
-		RenewDeadline:   15 * time.Second,
-		RetryPeriod:     5 * time.Second,
+		LeaseDuration:   1 * time.Minute,
+		RenewDeadline:   30 * time.Second,
+		RetryPeriod:     15 * time.Second,
 		Callbacks: leaderelection.LeaderCallbacks{
 			OnStartedLeading: func(ctx context.Context) {
 				// we're notified when we start - this is where you would

@@ -1,4 +1,4 @@
-replicaCount: 2
+replicaCount: 1
 
 leaderElectionNamespace: cattle-monitoring-system
 leaderElectionId: es-index-pruner
@@ -9,7 +9,7 @@ image:
   tag: "latest"
 
 config:
-  poll_interval: 500
+  poll_interval: 120
   aliases:
     - name: "cluster-logs"
       max_size: "50GiB"
