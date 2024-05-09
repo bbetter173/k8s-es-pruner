@@ -72,7 +72,7 @@ func main() {
 	}
 
 	logger.Infof("Configuration: %+v", cfg)
-	
+
 	// Create a new Elasticsearch client
 	esClient, err := elasticsearch.NewClient(cfg, logger)
 	if err != nil {
@@ -90,7 +90,7 @@ func main() {
 	run := func(ctx context.Context) {
 		// complete your controller loop here
 		klog.Info("Start es-index-pruner")
-		esClient.StartMonitoring(ctx, 5*time.Second)
+		esClient.StartMonitoring(ctx, time.Duration(cfg.PollInterval)*time.Second)
 	}
 
 	// use a Go context so we can tell the leaderelection code when we

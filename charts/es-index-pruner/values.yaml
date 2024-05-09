@@ -9,9 +9,10 @@ image:
   tag: "latest"
 
 config:
+  poll_interval: 500
   aliases:
     - name: "cluster-logs"
-      max_size: "20GiB"
+      max_size: "50GiB"
 
 resources: {}
   # limits:

@@ -1,3 +1,5 @@
+poll_interval: 500
+
 cluster:
   url: "http://localhost:9200"
   username: ""

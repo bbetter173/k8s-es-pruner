@@ -18,7 +18,8 @@ type Config struct {
 		CACertPath string `yaml:"ca_cert_path"`
 		SkipVerify bool   `yaml:"skip_tls_verify"`
 	} `yaml:"cluster"`
-	Aliases []Alias `yaml:"aliases"`
+	Aliases      []Alias `yaml:"aliases"`
+	PollInterval int     `yaml:"poll_interval"`
 }
 
 // Alias structure to hold alias-specific configurations
