@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"go.uber.org/zap"
 	"strconv"
 	"strings"
 )
@@ -47,4 +48,16 @@ func ParseSize(sizeStr string) (int64, error) {
 	totalBytes := int64(number * float64(units[unit]))
 
 	return totalBytes, nil
+}
+
+func SetupLogger() *zap.SugaredLogger {
+	logger, _ := zap.NewProduction()
+
+	defer func(logger *zap.Logger) {
+		err := logger.Sync()
+		if err != nil {
+			fmt.Printf("error syncing logger: %v", err)
+		}
+	}(logger) // flushes buffer, if any
+	return logger.Sugar()
 }

@@ -8,6 +8,7 @@ import (
 	"es-index-pruner/pkg/utils"
 	"fmt"
 	"github.com/elastic/go-elasticsearch/v8"
+	"go.uber.org/zap"
 	"net/http"
 	"sort"
 	"time"
@@ -19,6 +20,7 @@ type ESClient struct {
 	Alias  ESAlias
 
 	config config.Config
+	logger *zap.SugaredLogger
 }
 
 type ESAlias struct {
@@ -32,7 +34,7 @@ type ESIndex struct {
 	Size int64
 }
 
-func NewClient(cfg *config.Config) (*ESClient, error) {
+func NewClient(cfg *config.Config, logger *zap.SugaredLogger) (*ESClient, error) {
 	esCfg := elasticsearch.Config{
 		Addresses: []string{cfg.Cluster.URL},
 		Username:  cfg.Cluster.Username,
@@ -49,7 +51,7 @@ func NewClient(cfg *config.Config) (*ESClient, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &ESClient{Client: es, config: *cfg}, nil
+	return &ESClient{Client: es, config: *cfg, logger: logger}, nil
 }
 
 func (c *ESClient) StartMonitoring(interval time.Duration) {
@@ -62,7 +64,7 @@ func (c *ESClient) StartMonitoring(interval time.Duration) {
 			for _, aliasConfig := range c.config.Aliases {
 				err := c.ProcessAlias(aliasConfig)
 				if err != nil {
-					fmt.Printf("Error processing alias %s: %v\n", aliasConfig.Name, err)
+					c.logger.With("alias", aliasConfig.Name).Errorf("Error processing alias: %v", err)
 				}
 			}
 		}
@@ -124,12 +126,20 @@ func (c *ESClient) ProcessAlias(alias config.Alias) error {
 
 	// If total size exceeds max size, prune indices
 	if aliasInfo.TotalSize > maxSizeBytes {
-		fmt.Printf("Total size of %d exceeds max size of %d for alias %s\n", aliasInfo.TotalSize, maxSizeBytes, aliasInfo.Name)
+		c.logger.With(
+			"alias", aliasInfo.Name,
+			"total_size", aliasInfo.TotalSize,
+			"max_size", maxSizeBytes,
+		).Warnf("Total size exceeds max size for alias")
 		if err := c.pruneIndicesByMaxSize(ctx, aliasInfo.Indices, aliasInfo.TotalSize, maxSizeBytes); err != nil {
 			return fmt.Errorf("failed to prune indices: %v", err)
 		}
 	} else {
-		fmt.Printf("Total size of %d is within max size of %d for alias %s\n", c.Alias.TotalSize, maxSizeBytes, alias.Name)
+		c.logger.With(
+			"alias", aliasInfo.Name,
+			"total_size", aliasInfo.TotalSize,
+			"max_size", maxSizeBytes,
+		).Infof("Total size is within max size for alias")
 	}
 
 	return nil
